@@ -18,6 +18,7 @@ then there will be created several files, each containing one sprite.
 
 # Differences between formats
 HLM uses the following format to store data (all integers are storred in little-endian format and take up 32 bits):
+
 1) Offset from which begin files' contents (off)
 2) Number of files (n)
 Then, repeated n times:
