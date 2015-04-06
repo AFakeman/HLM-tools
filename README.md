@@ -4,11 +4,9 @@ These are used to unpack existing Hotline Miami (1 and 2) files, and to create y
 Packer1 and unpacker1 are intended to use for first part, and packer2 and unpacker2 are intended for second.
 
 #Usage
-Packers/unpackers have following syntax:
+Packers/unpacker now has the following syntax:
 
-[script_name].py [directory to store files or directory to take files from] [input or output file]
-
-If you don't provide these arguments, scripts will prompt you for them
+[script_name].py [pack or unpack] [1 or 2, depending on part of the game] [wad file name] [directory for packing or unpacking]
 
 Separator.py is meant to be used to cut character faces' sprites, and has the following syntax (requires PIL):
 
