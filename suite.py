@@ -2,29 +2,23 @@ import os
 import sys
 import struct
 
-def readInt32(file):
+def read_int32(file):
     return int(struct.unpack('<i',file.read(4))[0])
 
-def readInt64(file):
+def read_int64(file):
     return int(struct.unpack('<q',file.read(8))[0])
 
-def readString(file, length):
+def read_string(file, length):
     return file.read(length).decode('ASCII')
 
-def readByte(file):
-    return file.read(1)
-
-def writeInt32(file, int):
+def write_int32(file, int):
     file.write(struct.pack('<i',int))
 
-def writeInt64(file, int):
+def write_int64(file, int):
     file.write(struct.pack('<q',int))
 
-def writeString(file, str):
+def write_string(file, str):
     file.write(str)
-
-def writeByte(file, byte):
-    file.write(byte)
 
 def create_directories(name):
     if not os.path.exists(name):
@@ -32,21 +26,21 @@ def create_directories(name):
 
 def get_wad_metadata(file, version):
     if version == 1:
-        global_offset = readInt32(file)
+        global_offset = read_int32(file)
     else:
         global_offset = 0
-    file_count = readInt32(file)
+    file_count = read_int32(file)
     files = []
     for i in range(file_count):
         file_obj = {}
-        name_length = readInt32(file)
-        file_obj['name'] = readString(file, name_length)
+        name_length = read_int32(file)
+        file_obj['name'] = read_string(file, name_length)
         if version == 1:
-            file_obj['length'] = readInt32(file)
-            file_obj['offset'] = readInt32(file)
+            file_obj['length'] = read_int32(file)
+            file_obj['offset'] = read_int32(file)
         else:
-            file_obj['length'] = readInt64(file)
-            file_obj['offset'] = readInt64(file)
+            file_obj['length'] = read_int64(file)
+            file_obj['offset'] = read_int64(file)
         files.append(file_obj)
     if not global_offset:
         global_offset = file.tell()
@@ -54,17 +48,17 @@ def get_wad_metadata(file, version):
 
 def set_wad_metadata(file, version, offset, files):
     if version == 1:
-        writeInt32(file, offset)
-    writeInt32(file, len(files))
+        write_int32(file, offset)
+    write_int32(file, len(files))
     for file_obj in files:
-        writeInt32(file, len(file_obj['name']))
-        writeString(file, file_obj['name'])
+        write_int32(file, len(file_obj['name']))
+        write_string(file, file_obj['name'])
         if version == 1:
-            writeInt32(file, file_obj['length'])
-            writeInt32(file, file_obj['offset'])
+            write_int32(file, file_obj['length'])
+            write_int32(file, file_obj['offset'])
         else:
-            writeInt64(file, file_obj['length'])
-            writeInt64(file, file_obj['offset'])
+            write_int64(file, file_obj['length'])
+            write_int64(file, file_obj['offset'])
 
 def copy_from_file(file, files, offset):
     for file_obj in files:
@@ -106,25 +100,25 @@ if len(sys.argv) == 5:
     action = sys.argv[1]
     version = int(sys.argv[2])
     filename = sys.argv[3]
-    inputDir = sys.argv[4]
+    input_dir = sys.argv[4]
 
 else:
     action = raw_input("Pack or unpack?")
     version = int(raw_input("Part 1 or 2?"))
     filename = raw_input("Filename: ")
-    inputDir = raw_input("Directory: ")
+    input_dir = raw_input("Directory: ")
 
-create_directories(inputDir)
+create_directories(input_dir)
 
 if action == 'pack':
     wad_file = open(filename, 'wb')
-    os.chdir(inputDir)
-    offset, files = create_metadata(inputDir, version)
+    os.chdir(input_dir)
+    offset, files = create_metadata(input_dir, version)
     set_wad_metadata(wad_file, version, offset, files)
     copy_to_file(wad_file, files, offset)
 if action == 'unpack':
     wad_file = open(filename, 'rb')
-    os.chdir(inputDir)
+    os.chdir(input_dir)
     offset, files = get_wad_metadata(wad_file, version)
     copy_from_file(wad_file, files, offset)
 wad_file.close()
